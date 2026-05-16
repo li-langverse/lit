@@ -7,16 +7,30 @@ on:
     branches: [main]
 
 jobs:
-  smoke:
+  test:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - name: Checkout lic
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           repository: li-langverse/lic
           path: lic
           ref: main
-          token: ${{ secrets.LIC_CHECKOUT_TOKEN }}
-      - name: Toolchain pins
-        run: test -f lit/main.li && test -f li-toolchain.toml
+      - uses: actions/checkout@v4
+        with:
+          repository: li-langverse/lip
+          path: lip
+          ref: main
+      - name: Install LLVM 18
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build clang-18 llvm-18-dev
+      - name: lit test + coverage gate
+        env:
+          LLVM_DIR: /usr/lib/llvm-18/lib/cmake/llvm
+          CC: clang-18
+          CXX: clang++-18
+          LI_REPO: ${{ github.workspace }}/lic
+        run: |
+          chmod +x scripts/*.sh
+          ./scripts/ci.sh

@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+# lit — Li test runner + coverage gate (phase 8e).
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# shellcheck source=lit-common.sh
+source "$ROOT/scripts/lit-common.sh"
+
+usage() {
+  cat <<'EOF'
+lit — Li test runner
+
+  lit test [suite]              run package or repo tests
+  lit test --coverage           enforce min_coverage from li.toml (default 80)
+  lit test --coverage --allow-low-coverage
+  lit coverage report           print last coverage % for package
+  lit --version
+EOF
+}
+
+run_manifest() {
+  local tests_root="$1" manifest="$2" suite_filter="${3:-all}"
+  local lic="$4"
+  local pass=0 fail=0 skip=0
+  while IFS=$'\t' read -r suite file outcome substr; do
+    [[ "$suite_filter" == "all" || "$suite_filter" == "$suite" ]] || continue
+    local path="$tests_root/$file"
+    if [[ ! -f "$path" ]]; then
+      echo "SKIP missing $file"
+      skip=$((skip + 1))
+      continue
+    fi
+    case "$outcome" in
+      verify_ok|compile_ok)
+        if "$lic" build "$path" -o /dev/null 2>/dev/null; then
+          echo "PASS $outcome $file"
+          pass=$((pass + 1))
+        else
+          echo "FAIL $outcome $file"
+          fail=$((fail + 1))
+        fi
+        ;;
+      verify_fail|compile_fail)
+        if "$lic" build "$path" -o /dev/null 2>/dev/null; then
+          echo "FAIL $outcome $file (expected reject)"
+          fail=$((fail + 1))
+        else
+          echo "PASS $outcome $file"
+          pass=$((pass + 1))
+        fi
+        ;;
+      parse_ok)
+        if "$lic" parse "$path" >/dev/null 2>&1; then
+          echo "PASS parse_ok $file"
+          pass=$((pass + 1))
+        else
+          echo "FAIL parse_ok $file"
+          fail=$((fail + 1))
+        fi
+        ;;
+      *)
+        echo "SKIP unknown outcome $outcome for $file"
+        skip=$((skip + 1))
+        ;;
+    esac
+  done < <(lit_parse_manifest "$manifest")
+  echo "--- lit: pass=$pass fail=$fail skip=$skip"
+  [[ "$fail" -eq 0 ]]
+}
+
+cmd="${1:-}"
+case "$cmd" in
+  -h|--help|"") usage; exit 0 ;;
+  --version|-V) echo "lit 0.1.0"; exit 0 ;;
+  test)
+    shift
+    coverage=0
+    allow_low=0
+    suite="all"
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        --coverage) coverage=1; shift ;;
+        --allow-low-coverage) allow_low=1; shift ;;
+        -*) echo "lit: unknown flag $1" >&2; exit 1 ;;
+        *) suite="$1"; shift ;;
+      esac
+    done
+    LIC="$(lit_find_lic "$ROOT")" || { echo "lit: lic not found (build lic or set LIC)" >&2; exit 1; }
+    export LI_REPO_ROOT="${LI_REPO_ROOT:-$(dirname "$(dirname "$LIC")")/../..}"
+    PKG="."
+    if [[ -f ./li.toml ]]; then
+      PKG="$(pwd)"
+    fi
+    if [[ -f "$PKG/li-tests/manifest.toml" ]]; then
+      run_manifest "$PKG/li-tests" "$PKG/li-tests/manifest.toml" "$suite" "$LIC" || exit 1
+    elif [[ -n "${LI_REPO:-}" && -d "$LI_REPO/li-tests" ]]; then
+      exec "$LI_REPO/li-tests/run_all.sh" "$suite"
+    else
+      echo "lit: no li-tests/manifest.toml in $PKG" >&2
+      exit 1
+    fi
+    if [[ "$coverage" -eq 1 ]]; then
+      min="$(lit_min_coverage "$PKG")"
+      allow_flag="$allow_low"
+      pct="$(bash "$ROOT/scripts/lit-coverage.sh" "$PKG" "$min" "$LIC" "$allow_flag")"
+      echo "lit: coverage gate OK (${pct}% >= ${min}%)"
+    fi
+    ;;
+  coverage)
+    shift
+    sub="${1:-}"
+    if [[ "$sub" != "report" ]]; then
+      echo "lit: usage: lit coverage report" >&2
+      exit 1
+    fi
+    if [[ -f .lit/coverage_pct.txt ]]; then
+      echo "coverage: $(cat .lit/coverage_pct.txt)%"
+    else
+      echo "lit: no coverage report (run lit test --coverage first)" >&2
+      exit 1
+    fi
+    ;;
+  *)
+    echo "lit: unknown command '$cmd'" >&2
+    exit 1
+    ;;
+esac
