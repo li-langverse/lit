@@ -15,8 +15,7 @@ jobs:
         with:
           repository: li-langverse/lic
           path: lic
-          # TODO: revert to main after li-langverse/lic#4 merges
-          ref: fix/typecheck-ctx-init
+          ref: main
       - uses: actions/checkout@v6
         with:
           repository: li-langverse/lip
