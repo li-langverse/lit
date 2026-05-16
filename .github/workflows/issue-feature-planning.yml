@@ -15,8 +15,8 @@ jobs:
     if: github.event.issue.pull_request == null
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
         with:
           repository: li-langverse/benchmarks
           path: _agent-scripts
