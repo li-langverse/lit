@@ -15,8 +15,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Notify lip
         env:
-          GH_TOKEN: ${{ secrets.LI_DOWNSTREAM_DISPATCH_TOKEN || github.token }}
-          VERSION: ${{ github.event.release.tag_name || inputs.version }}
+          DISPATCH_PAT: ${{ secrets.LI_DOWNSTREAM_DISPATCH_TOKEN }}
+          VERSION: ${{ github.event.release.tag_name || github.event.inputs.version }}
         run: |
+          if [[ -n "$DISPATCH_PAT" ]]; then export GH_TOKEN="$DISPATCH_PAT"; else export GH_TOKEN="${{ github.token }}"; fi
           gh api repos/li-langverse/lip/dispatches -f event_type=lit-release \
-            -f "client_payload[version]=${VERSION}" -f client_payload[repo]=li-langverse/lit
+            -f "client_payload[version]=${VERSION}" -f "client_payload[repo]=li-langverse/lit"

@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout lic
+        uses: actions/checkout@v4
+        with:
+          repository: li-langverse/lic
+          path: lic
+          ref: main
+      - name: Toolchain pins
+        run: test -f lit/main.li && test -f li-toolchain.toml
