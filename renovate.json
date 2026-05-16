@@ -4,7 +4,7 @@
   "labels": ["dependencies"],
   "regexManagers": [
     {
-      "fileMatch": ["^li-toolchain\\.toml$"],
+      "fileMatch": ["(^|/)li-toolchain\\.toml$"],
       "matchStrings": ["lic_version\\s*=\\s*\"(?<currentValue>[^\"]+)\""],
       "depNameTemplate": "li-langverse/lic",
       "datasourceTemplate": "github-releases"
