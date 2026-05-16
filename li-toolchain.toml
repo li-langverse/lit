@@ -1,0 +1,3 @@
+[toolchain]
+lic_repo = "https://github.com/li-langverse/lic"
+lic_version = "0.1.0"

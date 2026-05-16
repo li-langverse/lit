@@ -1,0 +1,22 @@
+name: notify-downstream-lit
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        required: true
+permissions:
+  contents: read
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Notify lip
+        env:
+          GH_TOKEN: ${{ secrets.LI_DOWNSTREAM_DISPATCH_TOKEN || github.token }}
+          VERSION: ${{ github.event.release.tag_name || inputs.version }}
+        run: |
+          gh api repos/li-langverse/lip/dispatches -f event_type=lit-release \
+            -f "client_payload[version]=${VERSION}" -f client_payload[repo]=li-langverse/lit
