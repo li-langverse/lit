@@ -17,5 +17,6 @@ jobs:
           repository: li-langverse/lic
           path: lic
           ref: main
+          token: ${{ secrets.LIC_CHECKOUT_TOKEN }}
       - name: Toolchain pins
         run: test -f lit/main.li && test -f li-toolchain.toml
