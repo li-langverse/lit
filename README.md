@@ -20,6 +20,7 @@ cd ../lit && ./scripts/ci.sh
 
 | Doc | Content |
 |-----|---------|
+| [Published handbook (lit)](https://li-langverse.github.io/li-language/ecosystem/lit/) | Org status page on **li-language** Pages (after **lic** deploy) |
 | [docs/handbook.md](docs/handbook.md) | Cross-links to master plan and standards |
 | [lip: lit.md](https://github.com/li-langverse/lip/blob/main/docs/lit.md) | User-facing lit reference |
 
