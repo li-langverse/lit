@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+"$ROOT/scripts/check-ci-llvm-pin.sh"
 LI_REPO="${LI_REPO:-}"
 for p in "$ROOT/../li" "$ROOT/../lic"; do
   [[ -z "$LI_REPO" && -f "$p/scripts/build.sh" ]] && LI_REPO="$p"
@@ -9,7 +10,7 @@ done
 export LI_REPO
 export LLVM_DIR="${LLVM_DIR:-}"
 if [[ -z "$LLVM_DIR" ]] && command -v brew >/dev/null 2>&1; then
-  b="$(brew --prefix llvm@18 2>/dev/null)/lib/cmake/llvm"
+  b="$(brew --prefix llvm@22 2>/dev/null)/lib/cmake/llvm"
   [[ -d "$b" ]] && export LLVM_DIR="$b"
 fi
 (cd "$LI_REPO" && ./scripts/build.sh)
