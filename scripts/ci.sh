@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+"$ROOT/scripts/check-ci-llvm-pin.sh"
 LI_REPO="${LI_REPO:-}"
 for p in "$ROOT/../li" "$ROOT/../lic"; do
   [[ -z "$LI_REPO" && -f "$p/scripts/build.sh" ]] && LI_REPO="$p"
