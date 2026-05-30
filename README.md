@@ -21,6 +21,7 @@ cd ../lit && ./scripts/ci.sh
 | Doc | Content |
 |-----|---------|
 | **Live** | https://li-langverse.github.io/lit/ |
+| Ecosystem | [li-language handbook (lit)](https://li-langverse.github.io/li-language/ecosystem/lit/) |
 | [docs/handbook.md](docs/handbook.md) | Cross-links to master plan and standards |
 | [lip: lit.md](https://github.com/li-langverse/lip/blob/main/docs/lit.md) | User-facing lit reference |
 
