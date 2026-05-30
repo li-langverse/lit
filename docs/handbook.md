@@ -6,6 +6,7 @@
 
 | Doc | Role |
 |-----|------|
+| [Plan cross-links](https://github.com/li-langverse/lic/blob/main/docs/ecosystem/plan-cross-links.md) | Master plan ↔ gaps ↔ phase plans |
 | [Master plan](https://github.com/li-langverse/lic/blob/main/docs/superpowers/plans/2026-05-14-li-master-plan.md) | **lit** repo in org table |
 | [Package manager plan](https://github.com/li-langverse/lic/blob/main/docs/superpowers/plans/2026-05-16-li-package-manager-lip.md) | Coverage gate, manifests |
 | [Provability gaps](https://github.com/li-langverse/lic/blob/main/docs/verification/provability-gaps.md) | Do not conflate tests with Lean proof |
